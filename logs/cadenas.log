@@ -1,0 +1,75 @@
+2026-05-18 20:06:46,373 - __main__ - INFO - ======================================================================
+2026-05-18 20:06:46,373 - __main__ - INFO - INICIANDO ANÁLISIS DE SECUENCIA DE ADN
+2026-05-18 20:06:46,373 - __main__ - INFO - ======================================================================
+2026-05-18 20:06:46,373 - __main__ - INFO - 
+[PASO 1/5] Validando y leyendo archivo...
+2026-05-18 20:06:46,373 - cadenas - INFO - Leyendo archivo: data/input/prueba.txt
+2026-05-18 20:06:46,373 - cadenas - ERROR - Archivo no encontrado: data/input/prueba.txt
+2026-05-18 20:06:46,373 - __main__ - ERROR - Error durante el procesamiento: No se encontró el archivo: data/input/prueba.txt
+Traceback (most recent call last):
+  File "/home/ruri/github/adn_sc/cadenas.py", line 54, in leer_archivo
+    with open(ruta_archivo, 'r', encoding='utf-8') as file:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'data/input/prueba.txt'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/ruri/github/adn_sc/main.py", line 64, in main
+    contenido = leer_archivo(ruta_entrada)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ruri/github/adn_sc/cadenas.py", line 61, in leer_archivo
+    raise FileNotFoundError(f"No se encontró el archivo: {ruta_archivo}")
+FileNotFoundError: No se encontró el archivo: data/input/prueba.txt
+2026-05-18 20:13:36,788 - __main__ - INFO - ======================================================================
+2026-05-18 20:13:36,788 - __main__ - INFO - INICIANDO ANÁLISIS DE SECUENCIA DE ADN
+2026-05-18 20:13:36,788 - __main__ - INFO - ======================================================================
+2026-05-18 20:13:36,788 - __main__ - INFO - 
+[PASO 1/5] Validando y leyendo archivo...
+2026-05-18 20:13:36,788 - cadenas - INFO - Leyendo archivo: data/input/Homo_sapiens.txt
+2026-05-18 20:13:36,788 - cadenas - ERROR - Archivo no encontrado: data/input/Homo_sapiens.txt
+2026-05-18 20:13:36,788 - __main__ - ERROR - Error durante el procesamiento: No se encontró el archivo: data/input/Homo_sapiens.txt
+Traceback (most recent call last):
+  File "/home/ruri/github/adn_sc/cadenas.py", line 54, in leer_archivo
+    with open(ruta_archivo, 'r', encoding='utf-8') as file:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'data/input/Homo_sapiens.txt'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/ruri/github/adn_sc/main.py", line 64, in main
+    contenido = leer_archivo(ruta_entrada)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ruri/github/adn_sc/cadenas.py", line 61, in leer_archivo
+    raise FileNotFoundError(f"No se encontró el archivo: {ruta_archivo}")
+FileNotFoundError: No se encontró el archivo: data/input/Homo_sapiens.txt
+2026-05-18 20:13:59,884 - __main__ - INFO - ======================================================================
+2026-05-18 20:13:59,884 - __main__ - INFO - INICIANDO ANÁLISIS DE SECUENCIA DE ADN
+2026-05-18 20:13:59,884 - __main__ - INFO - ======================================================================
+2026-05-18 20:13:59,884 - __main__ - INFO - 
+[PASO 1/5] Validando y leyendo archivo...
+2026-05-18 20:13:59,884 - cadenas - INFO - Leyendo archivo: data/input/Homo_sapiens.txt
+2026-05-18 20:13:59,884 - cadenas - INFO - Archivo leído exitosamente. Tamaño: 320 caracteres
+2026-05-18 20:13:59,884 - __main__ - INFO - 
+[PASO 2/5] Limpiando cadena...
+2026-05-18 20:13:59,884 - cadenas - WARNING - Se encontraron bases inválidas: {'\n'}
+2026-05-18 20:13:59,884 - cadenas - WARNING - Se eliminarán las bases inválidas
+2026-05-18 20:13:59,884 - cadenas - INFO - Cadena limpia generada: 318 bases válidas
+2026-05-18 20:13:59,884 - __main__ - INFO - 
+[PASO 3/5] Generando caminata aleatoria...
+2026-05-18 20:13:59,884 - cadenas - INFO - Caminata aleatoria generada: 319 pasos
+2026-05-18 20:13:59,884 - __main__ - INFO - 
+[PASO 4/5] Realizando regresión lineal...
+2026-05-18 20:13:59,886 - cadenas - INFO - Regresión lineal completada. Pendiente: -0.061689, R²: 0.369143
+2026-05-18 20:14:00,000 - cadenas - INFO - Gráfica guardada: /home/ruri/github/adn_sc/data/output/graficas/caminata_aleatoria_Homo_sapiens.png
+2026-05-18 20:14:00,000 - __main__ - INFO - 
+[PASO 5/5] Aplicando rotación...
+2026-05-18 20:14:00,001 - cadenas - INFO - Rotación completada con ángulo 3.53°
+2026-05-18 20:14:00,116 - cadenas - INFO - Gráfica guardada: /home/ruri/github/adn_sc/data/output/graficas/rotacion_Homo_sapiens.png
+2026-05-18 20:14:00,117 - __main__ - INFO - 
+======================================================================
+2026-05-18 20:14:00,117 - __main__ - INFO - ANÁLISIS COMPLETADO EXITOSAMENTE
+2026-05-18 20:14:00,117 - __main__ - INFO - ======================================================================
+2026-05-18 20:14:00,117 - __main__ - INFO - Los logs se encuentran en: /home/ruri/github/adn_sc/logs/cadenas.log
+2026-05-18 20:14:00,117 - __main__ - INFO - Las gráficas se guardaron en: /home/ruri/github/adn_sc/data/output/graficas
