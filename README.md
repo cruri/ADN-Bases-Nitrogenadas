@@ -205,24 +205,21 @@ Para contribuir al proyecto:
 
 ## Autores
 
-- Tu Nombre - Servicio Social / Proyecto Académico
+- Fajardo Baltazar Gustavo Alexis - Servicio Social / Proyecto Académico
 
 ## Licencia
 
-Este proyecto está bajo la licencia MIT. Ver `LICENSE` para más detalles.
 
 ## Contacto
 
-- Email: tu.email@ejemplo.com
-- GitHub: [@tu-usuario](https://github.com/tu-usuario)
+- Email: ga.fajardobaltazar@ugto.mx
+- GitHub: [@cruri](https://github.com/cruri)
 
 ## Agradecimientos
 
-- Curso de Programación Científica
-- Supervisores del proyecto
-- Comunidad de código abierto
+- Dr.  Jóse de Jesús Bernal Alvarado
 
 ---
 
-**Última actualización**: 2024
+**Última actualización**: 2026
 **Versión**: 1.0.0
