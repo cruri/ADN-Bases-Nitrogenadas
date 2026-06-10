@@ -23,6 +23,7 @@ from cadenas import (
     leer_archivo,
     validar_extension,
     limpieza,
+    analizar_kmers, 
     caminata_aleatoria,
     regresion_lineal,
     rotacion,
@@ -70,6 +71,11 @@ def main(ruta_entrada, verbose=True):
         
         cadena_limpia = limpieza(contenido)
         
+        # =====================================================================
+        # ANÁLISIS DE K-MERS
+        # =====================================================================
+        logger.info("\n[EXTRA] Analizando k-mers (dimeros)...")
+        conteno_kmers, probabilidades_kmers = analizar_kmers(cadena_limpia, k=2, verbose=verbose)
         # =====================================================================
         # PASO 3: CAMINATA ALEATORIA
         # =====================================================================
@@ -158,6 +164,8 @@ def main(ruta_entrada, verbose=True):
         return {
             'exito': True,
             'cadena_limpia': cadena_limpia,
+            'conteo kmers' : conteno_kmers,
+            'probabilidaes kmers' : probabilidades_kmers,
             'caminata': caminata,
             'modelo': modelo,
             'pendiente': pendiente,
@@ -221,9 +229,14 @@ if __name__ == "__main__":
     # Ajustar configuración según argumentos
     if args.no_graficas:
         config.GUARDAR_GRAFICAS = False
+
+    if args.input in config.ARCHIVOS_ENTRADA:
+        ruta_a_analizar = config.ARCHIVOS_ENTRADA[args.input]
+    else:
+        ruta_a_analizar = args.input
     
     # Ejecutar análisis
-    resultado = main(args.input, verbose=args.verbose)
+    resultado = main(ruta_a_analizar, verbose=args.verbose)
     
     # Salir con código apropiado
     sys.exit(0 if resultado['exito'] else 1)

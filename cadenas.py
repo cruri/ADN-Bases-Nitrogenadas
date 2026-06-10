@@ -439,3 +439,63 @@ def graficar_rotacion(x_rotado, y_rotado, y_pred_rotado, theta, nombre_archivo=N
         logger.info(f"Gráfica guardada: {ruta_salida}")
     
     plt.show()
+
+# =============================================================================
+# ÁNALISIS K-MERS
+# =============================================================================
+
+def analizar_kmers(cadena_limpia, k=2, verbose=True):
+    """
+    Calcula la frecuencia y probabilidad de k-mers (subsecuencias) en la cadena.
+    
+    Parameters
+    ----------
+    cadena_limpia : list
+        Lista con las bases válidas (A, C, G, T).
+    k : int
+        Tamaño del k-mer (2 para dímeros, 3 para codones, etc.).
+    verbose : bool
+        Si True, imprime las estadísticas en consola.
+        
+    Returns
+    -------
+    tuple
+        (conteo_kmers, probabilidades)
+    """
+    if not cadena_limpia or len(cadena_limpia) < k:
+        raise ValueError(f"La cadena es demasiado corta para analizar k-mers de tamaño {k}")
+    
+    # Diccionario
+    conteo_kmers = {}
+    
+    N = len(cadena_limpia)
+    total_ventanas = N - k + 1
+
+    for i in range(total_ventanas):
+        ventana = cadena_limpia[i:i+k]
+        # Convertimos a cadena (str)
+        kmer = "".join(ventana)
+        conteo_kmers[kmer] = conteo_kmers.get(kmer,0) + 1
+
+    probabilidades = {}
+    for kmer, conteo in conteo_kmers.items():
+        probabilidades[kmer] = conteo / total_ventanas # Frecuencia Relativa
+
+    if verbose and config.VERBOSE:
+        print("\n" + "="*60)
+        print(f"ANÁLISIS DE K-MERS (k={k})")
+        print("="*60)
+        print(f"Total de subsecuencias encontradas: {total_ventanas}")
+        print(f"K-mers únicos identificados: {len(conteo_kmers)}")
+        print("\nTop 5 k-mers más frecuentes: ")
+
+        kmers_ordenados = sorted(probabilidades.items(), key=lambda item: item[1], reverse=True)
+
+        for kmer, prob in kmers_ordenados[:5]:
+            conteo_real = conteo_kmers[kmer]
+            print(f"- {kmer}: {conteo_real} apariciones (Prob: {prob:.4f})")
+        print("\n" + "="*60)
+
+    logger.info(f"Análisis de {k}-mers completado. {len(conteo_kmers)} combinaciones únicas encontradas.")
+
+    return conteo_kmers, probabilidades
