@@ -593,3 +593,132 @@ def graficar_espectro(frecuencias, espectro, nombre_archivo=None):
     
     # Cerrar la figura explícitamente para no consumir memoria ni mostrar ventana
     plt.close()
+
+
+def calcular_hurst_dfa(caminata, min_ventana=10, max_ventanas_divisor=4, num_puntos=20, verbose=True):
+    """
+    Calcula el Exponente de Hurst usando Análisis de Fluctuaciones sin Tendencia (DFA).
+    
+    Parameters
+    ----------
+    caminata : np.ndarray
+        Arreglo numérico con la caminata aleatoria.
+    min_ventana : int
+        Tamaño mínimo de la ventana (caja).
+    max_ventanas_divisor : int
+        Fracción del tamaño total para la ventana máxima (ej. N/4).
+    num_puntos : int
+        Cantidad de tamaños de ventana a evaluar.
+    verbose : bool
+        Si True, imprime el resultado y la interpretación en consola.
+        
+    Returns
+    -------
+    tuple
+        (Hurst, log_n, log_F, modelo_hurst)
+    """
+    N = len(caminata)
+    if N < min_ventana * 2:
+        raise ValueError("La caminata es demasiado corta para el análisis DFA.")
+
+    # 1. Generar tamaños de ventana espaciados logarítmicamente
+    max_ventana = N // max_ventanas_divisor
+    # Usamos np.unique para evitar tamaños duplicados al redondear a enteros
+    ventanas = np.unique(
+        np.logspace(np.log10(min_ventana), np.log10(max_ventana), num_puntos).astype(int)
+    )
+    
+    fluctuaciones = []
+    
+    # 2. Iterar sobre cada tamaño de caja (n)
+    for n in ventanas:
+        num_ventanas = N // n
+        
+        # Recortar la caminata para que sea un múltiplo exacto de 'n'
+        caminata_recortada = caminata[:num_ventanas * n]
+        
+        # Dividir eficientemente en fragmentos usando reshape
+        fragmentos = caminata_recortada.reshape(num_ventanas, n)
+        
+        x_local = np.arange(n)
+        suma_varianzas = 0
+        
+        # 3. Eliminar tendencia local en cada fragmento
+        for fragmento in fragmentos:
+            # np.polyfit ajusta un polinomio (grado 1 = línea recta)
+            coeficientes = np.polyfit(x_local, fragmento, 1)
+            tendencia = np.polyval(coeficientes, x_local)
+            
+            # Restar la tendencia y calcular la varianza de los residuos
+            residuos = fragmento - tendencia
+            suma_varianzas += np.var(residuos)
+            
+        # 4. Calcular la fluctuación cuadrática media (F_n)
+        promedio = suma_varianzas / num_ventanas
+        fluctuaciones.append(np.sqrt(promedio))
+        
+    # 5. Transformación log-log para la ley de potencia
+    log_n = np.log10(ventanas)
+    log_F = np.log10(fluctuaciones)
+    
+    # 6. Regresión lineal global para obtener la pendiente (Exponente de Hurst)
+    log_n_2d = log_n.reshape(-1, 1)
+    modelo_hurst = LinearRegression(fit_intercept=True)
+    modelo_hurst.fit(log_n_2d, log_F)
+    
+    H = modelo_hurst.coef_[0]
+    r2 = modelo_hurst.score(log_n_2d, log_F)
+    
+    # 7. Reporte e Interpretación
+    if verbose and config.VERBOSE:
+        print("\n" + "="*60)
+        print("ANÁLISIS DE EXPONENTE DE HURST (MÉTODO DFA)")
+        print("="*60)
+        print(f"Exponente de Hurst (H): {H:.4f}")
+        print(f"Coeficiente R² de la ley de potencia: {r2:.4f}")
+        print("-" * 60)
+        
+        # Interpretación física
+        if H < 0.45:
+            estado = "Antipersistente (Reversión constante a la media)"
+        elif 0.45 <= H <= 0.55:
+            estado = "Caminata Aleatoria Pura (Movimiento Browniano, sin memoria)"
+        else:
+            estado = "Persistente (Correlaciones positivas a largo plazo, fractal)"
+            
+        print(f"Comportamiento detectado: {estado}")
+        print("="*60 + "\n")
+        
+    logger.info(f"Análisis DFA completado. Exponente de Hurst: {H:.4f}")
+    
+    return H, log_n, log_F, modelo_hurst
+
+def graficar_hurst(log_n, log_F, modelo_hurst, H, nombre_archivo=None):
+    """
+    Genera el gráfico log-log de la fluctuación vs tamaño de ventana 
+    para ilustrar el Exponente de Hurst.
+    """
+    plt.figure(figsize=config.FIGSIZE_ROTACION, dpi=config.DPI)
+    
+    # Puntos reales medidos por el algoritmo
+    plt.scatter(log_n, log_F, color='teal', label='Fluctuaciones DFA ($F(n)$)', alpha=0.7, s=40)
+    
+    # Línea de regresión (La pendiente es H)
+    y_pred = modelo_hurst.predict(log_n.reshape(-1, 1))
+    plt.plot(log_n, y_pred, color='red', linestyle='--', linewidth=2.5, 
+             label=f'Ajuste de Ley de Potencia (Pendiente $H = {H:.4f}$)')
+    
+    # Estética
+    plt.xlabel('$\log_{10}(n)$ (Tamaño de ventana)', fontsize=12)
+    plt.ylabel('$\log_{10}(F(n))$ (Fluctuación)', fontsize=12)
+    plt.title('Análisis DFA: Correlaciones a Largo Alcance en ADN', fontsize=14, fontweight='bold')
+    plt.grid(True, alpha=0.3)
+    plt.legend(fontsize=11)
+    plt.tight_layout()
+    
+    if nombre_archivo and config.GUARDAR_GRAFICAS:
+        ruta_salida = config.DIRECTORIO_GRAFICAS / nombre_archivo
+        plt.savefig(ruta_salida, dpi=config.DPI, bbox_inches='tight')
+        logger.info(f"Gráfica de Hurst guardada en: {ruta_salida}")
+    
+    plt.close()

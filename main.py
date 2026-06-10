@@ -30,7 +30,9 @@ from cadenas import (
     graficar_caminata,
     graficar_rotacion,
     analizar_fourier,
-    graficar_espectro
+    graficar_espectro,
+    calcular_hurst_dfa,  
+    graficar_hurst
 )
 
 logger = obtener_logger(__name__)
@@ -153,6 +155,18 @@ def main(ruta_entrada, verbose=True):
         if config.GUARDAR_GRAFICAS:
             nombre_grafica_fourier = f"fourier_{Path(ruta_entrada).stem}.png"
             graficar_espectro(frecuencias_fft, espectro_fft, nombre_grafica_fourier)
+
+        # =====================================================================
+        # ANÁLISIS FRACTAL DE HURST (DFA)
+        # =====================================================================
+        logger.info("\n[EXTRA] Calculando Exponente de Hurst (Método DFA)...")
+        
+        # Le pasamos la caminata original (integrada), el algoritmo DFA se encarga de las tendencias
+        H, log_n, log_F, modelo_hurst = calcular_hurst_dfa(caminata, verbose=verbose)
+        
+        if config.GUARDAR_GRAFICAS:
+            nombre_grafica_hurst = f"hurst_dfa_{Path(ruta_entrada).stem}.png"
+            graficar_hurst(log_n, log_F, modelo_hurst, H, nombre_grafica_hurst)
 
         # =====================================================================
         # RESUMEN FINAL
