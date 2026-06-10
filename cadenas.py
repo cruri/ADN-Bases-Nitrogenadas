@@ -499,3 +499,97 @@ def analizar_kmers(cadena_limpia, k=2, verbose=True):
     logger.info(f"Análisis de {k}-mers completado. {len(conteo_kmers)} combinaciones únicas encontradas.")
 
     return conteo_kmers, probabilidades
+
+
+# =============================================================================
+# ÁNALISIS FOURIER
+# =============================================================================
+
+def analizar_fourier(y_rotado, verbose=True):
+    """
+    Calcula la Transformada Rápida de Fourier (FFT) y el Espectro de Potencia
+    de la caminata aleatoria rotada.
+    
+    Parameters
+    ----------
+    y_rotado : np.ndarray
+        Arreglo numérico con las posiciones de la caminata sin tendencia.
+    verbose : bool
+        Si True, muestra la frecuencia dominante en consola.
+        
+    Returns
+    -------
+    tuple
+        (frecuencias_filtradas, espectro_potencia_filtrado)
+    """
+    N = len(y_rotado)
+    if N == 0:
+        raise ValueError("El arreglo de datos rotados no puede estar vacío.")
+    
+    fft_valores = np.fft.fft(y_rotado)
+    espectro_potencia = np.abs(fft_valores) ** 2
+
+    frecuencias = np.fft.fftfreq(N, d=1.0)
+    
+    mitad = N // 2
+    frecuencias_filtradas = frecuencias[:mitad]
+    espectro_potencia_filtrado = espectro_potencia[:mitad]
+
+    if verbose and config.VERBOSE:
+        # Excluimos el índice 0 (frecuencia cero / componente DC) para buscar el pico real
+        idx_pico = np.argmax(espectro_potencia_filtrado[1:]) + 1
+        frec_dominante = frecuencias_filtradas[idx_pico]
+        potencia_max = espectro_potencia_filtrado[idx_pico]
+        
+        # Calcular el periodo (Periodo = 1 / Frecuencia)
+        periodo = 1 / frec_dominante if frec_dominante != 0 else float('inf')
+        
+        print("\n" + "="*60)
+        print("ANÁLISIS DE FRECUENCIAS (FOURIER)")
+        print("="*60)
+        print(f"Frecuencia dominante: {frec_dominante:.4f}")
+        print(f"Periodo equivalente: {periodo:.2f} bases")
+        print(f"Potencia del pico: {potencia_max:.2f}")
+        print("="*60 + "\n")
+        
+    logger.info(f"Análisis de Fourier completado. Mitad de espectro: {len(frecuencias_filtradas)} puntos.")
+    
+    return frecuencias_filtradas, espectro_potencia_filtrado
+
+
+def graficar_espectro(frecuencias, espectro, nombre_archivo=None):
+    """
+    Genera el gráfico del Espectro de Potencia (Periodograma) y lo guarda en disco
+    sin mostrarlo en pantalla.
+    
+    Parameters
+    ----------
+    frecuencias : np.ndarray
+        Arreglo con las frecuencias calculadas.
+    espectro : np.ndarray
+        Arreglo con la potencia correspondiente a cada frecuencia.
+    nombre_archivo : str, optional
+        Nombre del archivo con el que se guardará la gráfica.
+    """
+    # Usamos la configuración de tamaño de la rotación o una personalizada
+    plt.figure(figsize=config.FIGSIZE_ROTACION, dpi=config.DPI)
+    
+    # Graficamos la señal en el dominio de la frecuencia
+    plt.plot(frecuencias, espectro, color='darkviolet', linewidth=1.5, label='Espectro de Potencia')
+    
+    # Configuraciones estéticas de la gráfica
+    plt.xlabel('Frecuencia ($f$)', fontsize=12)
+    plt.ylabel('Potencia ($|X(f)|^2$)', fontsize=12)
+    plt.title('Espectro de Potencia de la Secuencia de ADN (FFT)', fontsize=14, fontweight='bold')
+    plt.grid(True, alpha=0.3)
+    plt.legend(fontsize=11)
+    plt.tight_layout()
+    
+    # Guardar automáticamente en la ruta preconfigurada
+    if nombre_archivo and config.GUARDAR_GRAFICAS:
+        ruta_salida = config.DIRECTORIO_GRAFICAS / nombre_archivo
+        plt.savefig(ruta_salida, dpi=config.DPI, bbox_inches='tight')
+        logger.info(f"Gráfica de Fourier guardada en: {ruta_salida}")
+    
+    # Cerrar la figura explícitamente para no consumir memoria ni mostrar ventana
+    plt.close()

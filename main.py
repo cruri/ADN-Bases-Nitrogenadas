@@ -28,7 +28,9 @@ from cadenas import (
     regresion_lineal,
     rotacion,
     graficar_caminata,
-    graficar_rotacion
+    graficar_rotacion,
+    analizar_fourier,
+    graficar_espectro
 )
 
 logger = obtener_logger(__name__)
@@ -136,6 +138,22 @@ def main(ruta_entrada, verbose=True):
                 resultado_rotacion['theta']
             )
         
+        # =====================================================================
+        # ANÁLISIS ESPECTRAL DE FOURIER
+        # =====================================================================
+        logger.info("\n[EXTRA] Aplicando Transformada Rápida de Fourier (FFT)...")
+        
+        # Pasamos y_rotado que extrajimos del diccionario de la rotación
+        frecuencias_fft, espectro_fft = analizar_fourier(
+            resultado_rotacion['y_rotado'], 
+            verbose=verbose
+        )
+        
+        # Generamos el nombre dinámico del archivo para guardar la gráfica
+        if config.GUARDAR_GRAFICAS:
+            nombre_grafica_fourier = f"fourier_{Path(ruta_entrada).stem}.png"
+            graficar_espectro(frecuencias_fft, espectro_fft, nombre_grafica_fourier)
+
         # =====================================================================
         # RESUMEN FINAL
         # =====================================================================
