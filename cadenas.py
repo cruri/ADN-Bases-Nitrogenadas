@@ -408,7 +408,6 @@ def graficar_caminata(x, y, y_pred, pendiente, nombre_archivo=None):
         plt.savefig(ruta_salida, dpi=config.DPI, bbox_inches='tight')
         logger.info(f"Gráfica guardada: {ruta_salida}")
     
-    plt.show()
 
 
 def graficar_rotacion(x_rotado, y_rotado, y_pred_rotado, theta, nombre_archivo=None):
@@ -445,7 +444,6 @@ def graficar_rotacion(x_rotado, y_rotado, y_pred_rotado, theta, nombre_archivo=N
         plt.savefig(ruta_salida, dpi=config.DPI, bbox_inches='tight')
         logger.info(f"Gráfica guardada: {ruta_salida}")
     
-    plt.show()
 
 # =============================================================================
 # ÁNALISIS K-MERS
