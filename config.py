@@ -26,7 +26,8 @@ for directory in [INPUT_DIR, OUTPUT_DIR, LOGS_DIR]:
 # ============================================================================
 ARCHIVOS_ENTRADA = {
     "homo_sapiens": INPUT_DIR / "Homo_sapiens.txt",
-    #"prueba": INPUT_DIR / "prueba.txt",
+    "secuencia": INPUT_DIR / "sequence.fasta",
+    "citocromo_c": INPUT_DIR / "citocromo_c_Homo_sapiens.fasta"
     # Agregar más referencias aquí según sea necesario
 }
 

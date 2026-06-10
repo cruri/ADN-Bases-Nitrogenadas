@@ -52,7 +52,14 @@ def leer_archivo(ruta_archivo):
     try:
         logger.info(f"Leyendo archivo: {ruta_archivo}")
         with open(ruta_archivo, 'r', encoding='utf-8') as file:
-            contenido = file.read()
+            lineas = file.readlines()
+            
+        # Ignoramos las lineas que empiezan con '>' (Encabezados FASTA)
+        # y quitamos los saltos de línea con .strip()
+        lineas_validas = [linea.strip() for linea in lineas if not linea.startswith('>')]
+        
+        # Unir todas las líneas válidas en una sola cadena de texto continua
+        contenido = "".join(lineas_validas)
         logger.info(f"Archivo leído exitosamente. Tamaño: {len(contenido)} caracteres")
         return contenido
     
