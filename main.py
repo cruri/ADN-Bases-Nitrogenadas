@@ -34,7 +34,7 @@ from cadenas import (
     calcular_hurst_dfa,  
     graficar_hurst
 )
-
+from generador import construir_matriz_transicion, generar_cadena_markov, guardar_secuencia_sintetica
 logger = obtener_logger(__name__)
 
 
@@ -79,7 +79,7 @@ def main(ruta_entrada, verbose=True):
         # ANÁLISIS DE K-MERS
         # =====================================================================
         logger.info("\n[EXTRA] Analizando k-mers (dimeros)...")
-        conteno_kmers, probabilidades_kmers = analizar_kmers(cadena_limpia, k=2, verbose=verbose)
+        conteo_kmers, probabilidades_kmers = analizar_kmers(cadena_limpia, k=2, verbose=verbose)
         # =====================================================================
         # PASO 3: CAMINATA ALEATORIA
         # =====================================================================
@@ -167,7 +167,32 @@ def main(ruta_entrada, verbose=True):
         if config.GUARDAR_GRAFICAS:
             nombre_grafica_hurst = f"hurst_dfa_{Path(ruta_entrada).stem}.png"
             graficar_hurst(log_n, log_F, modelo_hurst, H, nombre_grafica_hurst)
+        
+        # =====================================================================
+        # CADENA DE MARKOV
+        # =====================================================================
+        logger.info("\n[FASE 2] Iniciando generación de secuencia sintética...")
+        
+        # 1. Construir la Matriz usando el conteo de K-mers que ya calculamos
+        matriz_markov = construir_matriz_transicion(conteo_kmers, verbose=verbose)
+        
+        # 2. Generar una cadena sintética de la misma longitud que la original
+        longitud_original = len(cadena_limpia)
+        cadena_sintetica = generar_cadena_markov(matriz_markov, longitud_original)
+        
+        # Opcional: Imprimir una muestra para ver el resultado
+        if verbose:
+            print("\n" + "="*60)
+            print("MUESTRA DE SECUENCIA SINTÉTICA (Primeras 100 bases)")
+            print("="*60)
+            print("".join(cadena_sintetica[:100]))
+            print("="*60 + "\n")
 
+        # 3. Exportar la secuencia generada a un archivo físico
+        logger.info("\n[FASE 2] Exportando resultados a disco...")
+        nombre_salida = f"sintetica_markov_{Path(ruta_entrada).stem}.fasta"
+        guardar_secuencia_sintetica(cadena_sintetica, nombre_salida)
+        
         # =====================================================================
         # RESUMEN FINAL
         # =====================================================================
@@ -196,7 +221,7 @@ def main(ruta_entrada, verbose=True):
         return {
             'exito': True,
             'cadena_limpia': cadena_limpia,
-            'conteo kmers' : conteno_kmers,
+            'conteo kmers' : conteo_kmers,
             'probabilidaes kmers' : probabilidades_kmers,
             'caminata': caminata,
             'modelo': modelo,
